@@ -4,6 +4,13 @@
 
 Implementação de três algoritmos para geração de identidades únicas utilizando diferentes estruturas de dados: **Fila (Queue)**, **Pilha (Stack)** e **Lista Encadeada (Linked List)**. 
 
+## 👥 Equipe de Desenvolvimento
+- Francisco André
+- Francisco Bernardo
+- Erik Renan
+- Adonay Davyd
+- João Lucas
+
 Cada versão garante:
 - ✅ IDs não sequenciais
 - ✅ Sem repetições
