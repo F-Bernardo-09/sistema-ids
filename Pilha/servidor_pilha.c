@@ -16,7 +16,7 @@ typedef struct {
 } Pilha;
 
 Pilha* ids_usados;
-int contador_base = 1000;
+int contador_base = 1000000;
 
 // Cria uma nova pilha vazia
 Pilha* criar_pilha() {
@@ -33,6 +33,16 @@ void empilhar(Pilha* pilha, int id) {
     novo_no->anterior = pilha->topo;
     pilha->topo = novo_no;
     pilha->tamanho++;
+}
+
+// Desempilha um ID na pilha
+int desempilhar(Pilha* pilha) {
+    int id = pilha->topo->id;
+    NoPilha* no = pilha->topo->anterior;
+    free(pilha->topo);
+    pilha->topo = no;
+    pilha->tamanho--;
+    return id;
 }
 
 // Verifica se um ID já existe na pilha
@@ -61,9 +71,20 @@ int gerar_id_unico() {
     return novo_id;
 }
 
+void gerar_em_quantidade(Pilha* pilha){
+    int total = pilha->tamanho;
+    int diferenca = contador_base - total;
+    int c = 0;
+    while(c < diferenca){
+        int id = gerar_id_unico();
+        printf("Gerou id: %d",id);
+        c++;
+    }
+}
+
 int main() {
     srand(time(NULL));
-    ids_usados = criar_pilha();
+    Pilha* pilha = criar_pilha();
     
     int socket_servidor, novo_socket;
     struct sockaddr_in endereco;
@@ -74,26 +95,28 @@ int main() {
     socket_servidor = socket(AF_INET, SOCK_STREAM, 0);
     endereco.sin_family = AF_INET;
     endereco.sin_addr.s_addr = INADDR_ANY;
-    endereco.sin_port = htons(8080);
+    endereco.sin_port = htons(8081);
 
     bind(socket_servidor, (struct sockaddr *)&endereco, sizeof(endereco));
     listen(socket_servidor, 3);
 
     printf("Servidor PILHA aguardando conexoes na porta 8080...\n");
-    printf("IDs armazenados na pilha: %d\n", ids_usados->tamanho);
+    printf("IDs armazenados na pilha: %d\n", pilha->tamanho);
     
     while ((novo_socket = accept(socket_servidor, (struct sockaddr *)&endereco, 
            (socklen_t*)&tamanho_endereco)) >= 0) {
+            printf("funcionando");
         memset(buffer, 0, sizeof(buffer));
         read(novo_socket, buffer, 1024);
         
         if (strncmp(buffer, "GET_ID", 6) == 0) {
-            int id_gerado = gerar_id_unico();
-            sprintf(resposta, "ID:%d", id_gerado);
+            int id_gerado = desempilhar(pilha);
+            //sprintf(resposta, "ID:%d", id_gerado);
             send(novo_socket, resposta, strlen(resposta), 0);
-            printf("Enviado: %s (Total na pilha: %d)\n", resposta, ids_usados->tamanho);
+            printf("Enviado: %s (Total na pilha: %d)\n", resposta, pilha->tamanho);
         }
         close(novo_socket);
     }
+    free(pilha);
     return 0;
 }

@@ -47,7 +47,7 @@ int main() {
         memset(resposta_servidor, 0, sizeof(resposta_servidor));
         if (recv(socket_cliente, resposta_servidor, 2000, 0) > 0) {
             ids_recebidos++;
-            printf("ID %d: %s\n", ids_recebidos, resposta_servidor);
+           // printf("ID %d: %s\n", ids_recebidos, resposta_servidor);
         }
         
         close(socket_cliente);
